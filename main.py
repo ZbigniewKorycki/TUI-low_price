@@ -25,12 +25,19 @@ def init_driver(link_to_scrape):
     last_minute_offers_button.click()
     window_after = driver.window_handles[1]
     driver.switch_to.window(window_after)
-    time.sleep(5)
+    time.sleep(3)
     dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-field--airport"]')
     dropdown_airports_of_departure.click()
+    time.sleep(1)
+    airports = driver.find_elements(By.CLASS_NAME, "bp3-control-indicator")[10]
+    airports.click()
+    dropdown_airports_of_departure_submit = driver.find_element(By.CSS_SELECTOR,
+                                                         'button[data-testid="dropdown-window-button-submit"]')
+    dropdown_airports_of_departure_submit.click()
     time.sleep(300)
     driver.quit()
 
 
 init_driver("https://www.tui.pl/")
+
