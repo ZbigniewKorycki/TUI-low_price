@@ -26,6 +26,7 @@ def init_driver(link_to_scrape):
     window_after = driver.window_handles[1]
     driver.switch_to.window(window_after)
     time.sleep(3)
+    #choosing list of airport from where last minute offers should be shown
     dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-field--airport"]')
     dropdown_airports_of_departure.click()
@@ -35,6 +36,19 @@ def init_driver(link_to_scrape):
     dropdown_airports_of_departure_submit = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-window-button-submit"]')
     dropdown_airports_of_departure_submit.click()
+    time.sleep(1)
+    #choosing date period of arrivals
+    dropdown_dates = driver.find_element(By.CSS_SELECTOR,
+                                                         'button[data-testid="dropdown-field--travel-date"]')
+    dropdown_dates.click()
+    time.sleep(3)
+    offers_arrivals_from_date = driver.find_element(By.CSS_SELECTOR, 'time[datetime="2023-09-15T00:00:00.000"]')
+    offers_arrivals_from_date.click()
+    offers_arrivals_to_date = driver.find_element(By.CSS_SELECTOR, 'time[datetime="2023-09-23T00:00:00.000"]')
+    offers_arrivals_to_date.click()
+    dropdown_date_period_arrivals_submit = driver.find_element(By.CSS_SELECTOR,
+                                                                'button[data-testid="dropdown-window-button-submit"]')
+    dropdown_date_period_arrivals_submit.click()
     time.sleep(300)
     driver.quit()
 
