@@ -17,6 +17,18 @@ def init_driver(link_to_scrape):
     wait = WebDriverWait(driver, 3)
     driver.get(link_to_scrape)
     driver.maximize_window()
+    accept_cookies_button = driver.find_element(By.XPATH, "//button[contains(., 'Zaakceptuj')]")
+    accept_cookies_button.click()
+    time.sleep(1)
+    original_window = driver.window_handles[0]
+    last_minute_offers_button = driver.find_elements(By.CLASS_NAME, "desktop-menu-nav__link")[0]
+    last_minute_offers_button.click()
+    window_after = driver.window_handles[1]
+    driver.switch_to.window(window_after)
+    time.sleep(5)
+    dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
+                                                         'button[data-testid="dropdown-field--airport"]')
+    dropdown_airports_of_departure.click()
     time.sleep(300)
     driver.quit()
 
