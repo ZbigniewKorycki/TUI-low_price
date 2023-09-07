@@ -9,10 +9,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time
 
+
 def init_driver(link_to_scrape):
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
-    chrome_driver_path = "/Users/zbigniewkorycki/Downloads/chromedriver_mac64"
     driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
     wait = WebDriverWait(driver, 3)
     driver.get(link_to_scrape)
@@ -56,7 +56,7 @@ def init_driver(link_to_scrape):
                                                                'button[data-testid="global-search-button-submit"]')
     global_search_button_submit.click()
     time.sleep(15)
-    # offer = driver.find_element(By.CSS_SELECTOR,'div[data-testid="offer-tile"]').text
+    offer = driver.find_element(By.CSS_SELECTOR,'div[data-testid="offer-tile"]').text
     hotel = driver.find_element(By.CLASS_NAME, 'offer-tile-body__header').text
     country = driver.find_element(By.CSS_SELECTOR, 'nav[data-testid="offer-tile-breadcrumbs"]').text
     trip_advisor_opinion = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text
@@ -64,12 +64,7 @@ def init_driver(link_to_scrape):
     board_type = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]').text
     offer_dates = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]').text
 
-    print(price)
-    print(hotel)
-    print(country)
-    print(trip_advisor_opinion)
-    print(board_type)
-    print(offer_dates)
+    print(offer)
 
     time.sleep(300)
     driver.quit()
