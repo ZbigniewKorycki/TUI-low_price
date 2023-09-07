@@ -4,13 +4,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import time
-import datetime
+from datetime import datetime, timedelta
 import csv
 
-
 all_offers_from_given_dates = []
-
-
 
 
 def init_driver(link_to_scrape):
@@ -43,17 +40,16 @@ def init_driver(link_to_scrape):
         airport_checkbox.click()
 
     acceptable_airports_submit = driver.find_element(By.CSS_SELECTOR,
-                                                                'button[data-testid="dropdown-window-button-submit"]')
+                                                     'button[data-testid="dropdown-window-button-submit"]')
     acceptable_airports_submit.click()
     time.sleep(3)
 
     # choosing date period of arrivals
-    start = datetime.datetime.today()
+    start = '2023-09-15'
     num_of_dates = 8
-    date_list = [start.date() + datetime.timedelta(days=x) for x in range(num_of_dates)]
+    date_list = [datetime.strptime(start, '%Y-%m-%d').date() + timedelta(days=x) for x in range(num_of_dates)]
     date_list_format_of_tui = [date.strftime("%Y-%m-%d") for date in date_list]
-    date_range_to_find_offers_start = 15
-    while date_range_to_find_offers_start <= 17:
+    for date in date_list_format_of_tui:
         dropdown_dates = driver.find_element(By.CSS_SELECTOR,
                                              'button[data-testid="dropdown-field--travel-date"]')
         dropdown_dates.click()
@@ -63,7 +59,7 @@ def init_driver(link_to_scrape):
         specific_day_offers.click()
         time.sleep(1)
         offers_arrivals_from_date = driver.find_element(By.CSS_SELECTOR,
-                                                        f'time[datetime="2023-09-{date_range_to_find_offers_start}T00:00:00.000"]')
+                                                        f'time[datetime="{date}T00:00:00.000"]')
         offers_arrivals_from_date.click()
         time.sleep(1)
         dropdown_date_period_arrivals_submit = driver.find_element(By.CSS_SELECTOR,
@@ -168,7 +164,6 @@ def init_driver(link_to_scrape):
                 "offer_link": offer_link
             }
             all_offers_from_given_dates.append(single_offer)
-        date_range_to_find_offers_start += 1
         time.sleep(5)
     tui_offers = f"tui_offers_from_day_to.csv"
     fields = ["hotel", "country", "region", "offer_link", "trip_advisor_rating", "trip_advisor_opinions",
