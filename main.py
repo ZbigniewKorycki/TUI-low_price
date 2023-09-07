@@ -4,7 +4,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import time
+import datetime
 import csv
+
 
 all_offers_from_given_dates = []
 
@@ -33,6 +35,7 @@ def init_driver(link_to_scrape):
     dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-field--airport"]')
     dropdown_airports_of_departure.click()
+
     time.sleep(1)
     acceptable_airports = ["Warszawa-Chopina", "Warszawa-Radom", "Warszawa-Modlin"]
     for airport in acceptable_airports:
@@ -45,6 +48,10 @@ def init_driver(link_to_scrape):
     time.sleep(3)
 
     # choosing date period of arrivals
+    start = datetime.datetime.today()
+    num_of_dates = 8
+    date_list = [start.date() + datetime.timedelta(days=x) for x in range(num_of_dates)]
+    date_list_format_of_tui = [date.strftime("%Y-%m-%d") for date in date_list]
     date_range_to_find_offers_start = 15
     while date_range_to_find_offers_start <= 17:
         dropdown_dates = driver.find_element(By.CSS_SELECTOR,
