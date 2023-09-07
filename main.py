@@ -10,6 +10,14 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 
 
+def handle_no_offer_details(element_to_find):
+    try:
+        details_value = element_to_find
+    except NoSuchElementException:
+        details_value = 0
+    return details_value
+
+
 def init_driver(link_to_scrape):
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
@@ -56,38 +64,42 @@ def init_driver(link_to_scrape):
                                                       'button[data-testid="global-search-button-submit"]')
     global_search_button_submit.click()
     time.sleep(15)
-    hotel = driver.find_element(By.CLASS_NAME, 'offer-tile-body__header').text
-    country = driver.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(", ")[0]
-    region = driver.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(", ")[1:]
-    offer_link = driver.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('href')
-    trip_advisor_rating = \
-    driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[0]
-    trip_advisor_opinions = \
-    driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[1]
-    departure_airport = \
-    driver.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[0]
-    departure_time = \
-    driver.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[1].replace("(",
-                                                                                                                    "").replace(
-        ")", "")
-    price = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="price-amount"]').text.replace(" ", "")
-    currency = driver.find_element(By.CLASS_NAME, 'price-value__currency').text
-    board_type = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]').text
-    offer_dates = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]').text
 
-    print(f"Hotel: {hotel}")
-    print(f"country: {country}")
-    print(f"region : {region}")
-    print(f"trip_advisor_rating: {trip_advisor_rating}")
-    print(f"trip_advisor_opinions: {trip_advisor_opinions}")
-    print(f"departure_airport: {departure_airport}")
-    print(f"departure_time: {departure_time}")
-    print(f"price: {price}")
-    print(f"currency: {currency}")
-    print(f"board_type: {board_type}")
-    print(f"offer_dates: {offer_dates}")
-    print(f"offer_link: {offer_link}")
-    time.sleep(300)
+    offers = driver.find_elements(By.CSS_SELECTOR, 'div[data-testid="offer-tile"]')
+    print(offers)
+
+    for offer in offers:
+        hotel = offer.find_element(By.CLASS_NAME, 'offer-tile-body__header').text
+        country = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(", ")[0]
+        region = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(", ")[1:]
+        offer_link = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('href')
+        trip_advisor_rating = \
+        offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[0]
+        trip_advisor_opinions = \
+        offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[1]
+        departure_airport = \
+        offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[0]
+        departure_time = \
+        offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[1].replace("(",
+                                                                                                                        "").replace(
+            ")", "")
+        price = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="price-amount"]').text.replace(" ", "")
+        currency = offer.find_element(By.CLASS_NAME, 'price-value__currency').text
+        board_type = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]').text
+        offer_dates = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]').text
+        print("Jestem tu")
+        print(f"Hotel: {hotel}")
+        print(f"country: {country}")
+        print(f"region : {region}")
+        print(f"trip_advisor_rating: {trip_advisor_rating}")
+        print(f"trip_advisor_opinions: {trip_advisor_opinions}")
+        print(f"departure_airport: {departure_airport}")
+        print(f"departure_time: {departure_time}")
+        print(f"price: {price}")
+        print(f"currency: {currency}")
+        print(f"board_type: {board_type}")
+        print(f"offer_dates: {offer_dates}")
+        print(f"offer_link: {offer_link}")
     driver.quit()
 
 
