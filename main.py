@@ -4,8 +4,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time
 import csv
@@ -41,7 +39,7 @@ def init_driver(link_to_scrape):
     dropdown_airports_of_departure_submit = driver.find_element(By.CSS_SELECTOR,
                                                                 'button[data-testid="dropdown-window-button-submit"]')
     dropdown_airports_of_departure_submit.click()
-    time.sleep(3)
+    WebDriverWait(driver, 3)
     # choosing date period of arrivals
 
     date_range_to_find_offers_start = 15
@@ -64,70 +62,88 @@ def init_driver(link_to_scrape):
                                                                    'button[data-testid="dropdown-window-button-submit"]')
         dropdown_date_period_arrivals_submit.click()
 
-        time.sleep(2)
+        time.sleep(1)
 
         global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
                                                           'button[data-testid="global-search-button-submit"]')
         global_search_button_submit.click()
-        time.sleep(10)
-        offers = driver.find_elements(By.CSS_SELECTOR, 'div[data-testid="offer-tile"]')
+        time.sleep(15)
+        offers_for_current_day = driver.find_elements(By.CSS_SELECTOR, 'div[data-testid="offer-tile"]')
 
-        for offer in offers:
+        for offer in offers_for_current_day:
             try:
-                hotel = offer.find_element(By.CLASS_NAME, 'offer-tile-body__header').text
+                hotel = offer.find_element(By.CLASS_NAME, 'offer-tile-body__header')
+                hotel = hotel.text
             except NoSuchElementException:
                 hotel = None
             try:
-                country = \
-                offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(", ")[0]
+                country = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
+                country = country.get_attribute('destination').split(", ")[0]
             except NoSuchElementException:
                 country = None
             try:
-                region = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('destination').split(
-                    ", ")[1:]
+                region = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
+                region = region.get_attribute('destination')
             except NoSuchElementException:
                 region = None
             try:
-                offer_link = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]').get_attribute('href')
+                offer_link = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
+                offer_link = offer_link.get_attribute('href')
             except NoSuchElementException:
                 offer_link = None
             try:
-                trip_advisor_rating = \
-                offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[0]
+                trip_advisor_rating = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]')
+                trip_advisor_rating = trip_advisor_rating.text.split("\n")[0]
             except NoSuchElementException:
                 trip_advisor_rating = None
             try:
-                trip_advisor_opinions = \
-                offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]').text.split("\n")[1]
+                trip_advisor_opinions = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]')
+                trip_advisor_opinions = trip_advisor_opinions.text.split("\n")[1]
             except NoSuchElementException:
                 trip_advisor_opinions = None
             try:
-                departure_airport = \
-                offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[0]
+                departure_airport = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]')
+                departure_airport = departure_airport.text.split(" ")[0]
             except NoSuchElementException:
                 departure_airport = None
             try:
-                departure_time = \
-                offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]').text.split(" ")[
-                    1].replace("(", "").replace(")", "")
+                departure_time = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]')
+                departure_time = departure_time.text.split(" ")[1].replace("(", "").replace(")", "")
             except NoSuchElementException:
                 departure_time = None
             try:
-                price = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="price-amount"]').text.replace(" ", "")
+                price = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="price-amount"]')
+                price = price.text.replace(" ", "")
             except NoSuchElementException:
                 price = None
             try:
-                currency = offer.find_element(By.CLASS_NAME, 'price-value__currency').text
+                currency = offer.find_element(By.CLASS_NAME, 'price-value__currency')
+                currency = currency.text
             except NoSuchElementException:
                 currency = None
             try:
-                board_type = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]').text
+                board_type = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]')
+                board_type = board_type.text
             except NoSuchElementException:
                 board_type = None
             try:
-                offer_date = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]').text
+                offer_date = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]')
+                offer_date = offer_date.text
             except NoSuchElementException:
                 offer_date = None
+
+            print(f"Hotel: {hotel}")
+            print(f"country: {country}")
+            print(f"region : {region}")
+            print(f"trip_advisor_rating: {trip_advisor_rating}")
+            print(f"trip_advisor_opinions: {trip_advisor_opinions}")
+            print(f"departure_airport: {departure_airport}")
+            print(f"departure_time: {departure_time}")
+            print(f"price: {price}")
+            print(f"currency: {currency}")
+            print(f"board_type: {board_type}")
+            print(f"offer_date: {offer_date}")
+            print(f"offer_link: {offer_link}")
 
             single_offer = {
                 "hotel": hotel,
@@ -145,19 +161,6 @@ def init_driver(link_to_scrape):
             }
             all_offers_from_given_dates.append(single_offer)
 
-            # print(f"Hotel: {hotel}")
-            # print(f"country: {country}")
-            # print(f"region : {region}")
-            # print(f"trip_advisor_rating: {trip_advisor_rating}")
-            # print(f"trip_advisor_opinions: {trip_advisor_opinions}")
-            # print(f"departure_airport: {departure_airport}")
-            # print(f"departure_time: {departure_time}")
-            # print(f"price: {price}")
-            # print(f"currency: {currency}")
-            # print(f"board_type: {board_type}")
-            # print(f"offer_date: {offer_date}")
-            # print(f"offer_link: {offer_link}")
-
         date_range_to_find_offers_start += 1
         time.sleep(5)
     tui_offers = f"tui_offers_from_day_to.csv"
@@ -170,3 +173,6 @@ def init_driver(link_to_scrape):
     driver.quit()
 
 init_driver("https://www.tui.pl/")
+
+
+
