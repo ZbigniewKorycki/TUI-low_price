@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import time
@@ -14,14 +12,13 @@ all_offers_from_given_dates = []
 def init_driver(link_to_scrape):
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
-    driver = webdriver.Chrome(options=chrome_options, service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=chrome_options)
     wait = WebDriverWait(driver, 3)
     driver.get(link_to_scrape)
     driver.maximize_window()
     accept_cookies_button = driver.find_element(By.XPATH, "//button[contains(., 'Zaakceptuj')]")
     accept_cookies_button.click()
     time.sleep(1)
-    original_window = driver.window_handles[0]
     last_minute_offers_button = driver.find_elements(By.CLASS_NAME, "desktop-menu-nav__link")[0]
     last_minute_offers_button.click()
     window_after = driver.window_handles[1]
@@ -29,6 +26,7 @@ def init_driver(link_to_scrape):
     driver.close()
     driver.switch_to.window(window_after)
     time.sleep(3)
+
     # choosing list of airport from where last minute offers should be shown
     dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-field--airport"]')
@@ -39,13 +37,11 @@ def init_driver(link_to_scrape):
     dropdown_airports_of_departure_submit = driver.find_element(By.CSS_SELECTOR,
                                                                 'button[data-testid="dropdown-window-button-submit"]')
     dropdown_airports_of_departure_submit.click()
-    WebDriverWait(driver, 3)
+    time.sleep(3)
+
     # choosing date period of arrivals
-
     date_range_to_find_offers_start = 15
-
     while date_range_to_find_offers_start <= 17:
-
         dropdown_dates = driver.find_element(By.CSS_SELECTOR,
                                              'button[data-testid="dropdown-field--travel-date"]')
         dropdown_dates.click()
@@ -61,15 +57,13 @@ def init_driver(link_to_scrape):
         dropdown_date_period_arrivals_submit = driver.find_element(By.CSS_SELECTOR,
                                                                    'button[data-testid="dropdown-window-button-submit"]')
         dropdown_date_period_arrivals_submit.click()
-
         time.sleep(1)
-
         global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
                                                           'button[data-testid="global-search-button-submit"]')
         global_search_button_submit.click()
+
         time.sleep(15)
         offers_for_current_day = driver.find_elements(By.CSS_SELECTOR, 'div[data-testid="offer-tile"]')
-
         for offer in offers_for_current_day:
             try:
                 hotel = offer.find_element(By.CLASS_NAME, 'offer-tile-body__header')
@@ -92,12 +86,14 @@ def init_driver(link_to_scrape):
             except NoSuchElementException:
                 offer_link = None
             try:
-                trip_advisor_rating = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]')
+                trip_advisor_rating = offer.find_element(By.CSS_SELECTOR,
+                                                         'div[data-testid="tripadvisor-opinions-badge"]')
                 trip_advisor_rating = trip_advisor_rating.text.split("\n")[0]
             except NoSuchElementException:
                 trip_advisor_rating = None
             try:
-                trip_advisor_opinions = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="tripadvisor-opinions-badge"]')
+                trip_advisor_opinions = offer.find_element(By.CSS_SELECTOR,
+                                                           'div[data-testid="tripadvisor-opinions-badge"]')
                 trip_advisor_opinions = trip_advisor_opinions.text.split("\n")[1]
             except NoSuchElementException:
                 trip_advisor_opinions = None
@@ -160,19 +156,16 @@ def init_driver(link_to_scrape):
                 "offer_link": offer_link
             }
             all_offers_from_given_dates.append(single_offer)
-
         date_range_to_find_offers_start += 1
         time.sleep(5)
     tui_offers = f"tui_offers_from_day_to.csv"
     fields = ["hotel", "country", "region", "offer_link", "trip_advisor_rating", "trip_advisor_opinions",
               "departure_airport", "departure_time", "price", "currency", "board_type", "offer_date"]
-    with open(tui_offers, "w") as csvfile:
+    with open(tui_offers, "w", newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fields)
         writer.writeheader()
         writer.writerows(all_offers_from_given_dates)
     driver.quit()
 
+
 init_driver("https://www.tui.pl/")
-
-
-
