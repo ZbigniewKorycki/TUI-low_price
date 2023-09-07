@@ -9,6 +9,8 @@ import csv
 all_offers_from_given_dates = []
 
 
+
+
 def init_driver(link_to_scrape):
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
@@ -32,11 +34,14 @@ def init_driver(link_to_scrape):
                                                          'button[data-testid="dropdown-field--airport"]')
     dropdown_airports_of_departure.click()
     time.sleep(1)
-    airports = driver.find_elements(By.CLASS_NAME, "bp3-control-indicator")[10]
-    airports.click()
-    dropdown_airports_of_departure_submit = driver.find_element(By.CSS_SELECTOR,
+    acceptable_airports = ["Warszawa-Chopina", "Warszawa-Radom", "Warszawa-Modlin"]
+    for airport in acceptable_airports:
+        airport_checkbox = driver.find_element(By.XPATH, f'//label[contains(text(), "{airport}")]')
+        airport_checkbox.click()
+
+    acceptable_airports_submit = driver.find_element(By.CSS_SELECTOR,
                                                                 'button[data-testid="dropdown-window-button-submit"]')
-    dropdown_airports_of_departure_submit.click()
+    acceptable_airports_submit.click()
     time.sleep(3)
 
     # choosing date period of arrivals
