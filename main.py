@@ -27,6 +27,8 @@ def init_driver(link_to_scrape):
     last_minute_offers_button = driver.find_elements(By.CLASS_NAME, "desktop-menu-nav__link")[0]
     last_minute_offers_button.click()
     window_after = driver.window_handles[1]
+    time.sleep(3)
+    driver.close()
     driver.switch_to.window(window_after)
     time.sleep(3)
     # choosing list of airport from where last minute offers should be shown
