@@ -41,10 +41,6 @@ def split_and_get_second(text, delimiter):
     return text.split(delimiter)[1]
 
 
-def remove_parentheses(text):
-    return text.replace("(", "").replace(")", "")
-
-
 def remove_whitespace(text):
     return text.replace(" ", "")
 
@@ -90,8 +86,8 @@ def init_driver(link_to_scrape):
 
     # choosing date period of arrivals
     time.sleep(1)
-    start = '2023-09-15'
-    num_of_dates = 8
+    start = '2023-09-08'
+    num_of_dates = 6
     date_list = [datetime.strptime(start, '%Y-%m-%d').date() + timedelta(days=x) for x in range(num_of_dates)]
     date_list_format_of_tui = [date.strftime("%Y-%m-%d") for date in date_list]
     for date in date_list_format_of_tui:
@@ -121,13 +117,11 @@ def init_driver(link_to_scrape):
             hotel = find_element_with_exception(offer, By.CLASS_NAME, 'offer-tile-body__header', text_to_extract=True)
             country = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]',
                                                   attribute="destination")
-            country = process_variable(country, split_and_get_first,", ")
             region = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]', attribute="destination")
             offer_link = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]', attribute="href")
             trip_advisor_rating = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                               'div[data-testid="tripadvisor-opinions-badge"]',
                                                               text_to_extract=True)
-            trip_advisor_rating = process_variable(trip_advisor_rating, split_and_get_first,"\n")
             trip_advisor_opinions = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                                 'div[data-testid="tripadvisor-opinions-badge"]',
                                                                 text_to_extract=True)
@@ -135,21 +129,24 @@ def init_driver(link_to_scrape):
             departure_airport = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                             'div[data-testid="dropdown--same-day-offers"]',
                                                             text_to_extract=True)
-            departure_airport = process_variable(departure_airport, split_and_get_first, " ")
-
             departure_time = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                          'div[data-testid="dropdown--same-day-offers"]',
                                                          text_to_extract=True)
-            departure_time = process_variable(departure_time, split_and_get_second, " ")
+
             price = find_element_with_exception(offer, By.CSS_SELECTOR, 'span[data-testid="price-amount"]',
                                                 text_to_extract=True)
-            price = process_variable(price, remove_whitespace)
             currency = find_element_with_exception(offer, By.CLASS_NAME, 'price-value__currency', text_to_extract=True)
             board_type = find_element_with_exception(offer, By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]',
                                                      text_to_extract=True)
             offer_date = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                      'span[data-testid="offer-tile-departure-date"]',
                                                      text_to_extract=True)
+
+            country = process_variable(country, split_and_get_first, ", ")
+            trip_advisor_rating = process_variable(trip_advisor_rating, split_and_get_first, "\n")
+            departure_airport = process_variable(departure_airport, split_and_get_first, " ")
+            departure_time = process_variable(departure_time, split_and_get_second, " ")
+            price = process_variable(price, remove_whitespace)
 
             print(f"Hotel: {hotel}")
             print(f"country: {country}")
