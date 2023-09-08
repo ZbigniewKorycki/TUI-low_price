@@ -87,7 +87,7 @@ def init_driver(link_to_scrape):
     # choosing date period of arrivals
     time.sleep(1)
     start = '2023-09-08'
-    num_of_dates = 6
+    num_of_dates = 7
     date_list = [datetime.strptime(start, '%Y-%m-%d').date() + timedelta(days=x) for x in range(num_of_dates)]
     date_list_format_of_tui = [date.strftime("%Y-%m-%d") for date in date_list]
     for date in date_list_format_of_tui:
@@ -106,7 +106,7 @@ def init_driver(link_to_scrape):
         dropdown_date_period_arrivals_submit = driver.find_element(By.CSS_SELECTOR,
                                                                    'button[data-testid="dropdown-window-button-submit"]')
         dropdown_date_period_arrivals_submit.click()
-        time.sleep(1)
+        time.sleep(2)
         global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
                                                           'button[data-testid="global-search-button-submit"]')
         global_search_button_submit.click()
@@ -148,18 +148,18 @@ def init_driver(link_to_scrape):
             departure_time = process_variable(departure_time, split_and_get_second, " ")
             price = process_variable(price, remove_whitespace)
 
-            print(f"Hotel: {hotel}")
-            print(f"country: {country}")
-            print(f"region : {region}")
-            print(f"trip_advisor_rating: {trip_advisor_rating}")
-            print(f"trip_advisor_opinions: {trip_advisor_opinions}")
-            print(f"departure_airport: {departure_airport}")
-            print(f"departure_time: {departure_time}")
-            print(f"price: {price}")
-            print(f"currency: {currency}")
-            print(f"board_type: {board_type}")
-            print(f"offer_date: {offer_date}")
-            print(f"offer_link: {offer_link}")
+            # print(f"Hotel: {hotel}")
+            # print(f"country: {country}")
+            # print(f"region : {region}")
+            # print(f"trip_advisor_rating: {trip_advisor_rating}")
+            # print(f"trip_advisor_opinions: {trip_advisor_opinions}")
+            # print(f"departure_airport: {departure_airport}")
+            # print(f"departure_time: {departure_time}")
+            # print(f"price: {price}")
+            # print(f"currency: {currency}")
+            # print(f"board_type: {board_type}")
+            # print(f"offer_date: {offer_date}")
+            # print(f"offer_link: {offer_link}")
 
             single_offer = {
                 "hotel": hotel,
@@ -177,7 +177,7 @@ def init_driver(link_to_scrape):
             }
             all_offers_from_given_dates.append(single_offer)
         time.sleep(5)
-    tui_offers = f"tui_offers_from_day_to.csv"
+    tui_offers = "TUI_last_minute_offers.csv"
     fields = ["hotel", "country", "region", "offer_link", "trip_advisor_rating", "trip_advisor_opinions",
               "departure_airport", "departure_time", "price", "currency", "board_type", "offer_date"]
     with open(tui_offers, "w", newline='') as csvfile:
@@ -188,4 +188,7 @@ def init_driver(link_to_scrape):
 
 
 init_driver("https://www.tui.pl/")
+
+
+
 
