@@ -87,13 +87,19 @@ def init_driver(link_to_scrape):
     # choosing date period of arrivals
     time.sleep(1)
     start = '2023-09-08'
-    num_of_dates = 7
+    num_of_dates = 10
     date_list = [datetime.strptime(start, '%Y-%m-%d').date() + timedelta(days=x) for x in range(num_of_dates)]
     date_list_format_of_tui = [date.strftime("%Y-%m-%d") for date in date_list]
     for date in date_list_format_of_tui:
-        dropdown_dates = driver.find_element(By.CSS_SELECTOR,
-                                             'button[data-testid="dropdown-field--travel-date"]')
-        dropdown_dates.click()
+        try:
+            dropdown_dates = driver.find_element(By.CSS_SELECTOR,
+                                                 'button[data-testid="dropdown-field--travel-date"]')
+            dropdown_dates.click()
+        except ElementClickInterceptedException:
+            time.sleep(3)
+            dropdown_dates = driver.find_element(By.CSS_SELECTOR,
+                                                 'button[data-testid="dropdown-field--travel-date"]')
+            dropdown_dates.click()
         time.sleep(1)
         specific_day_offers = driver.find_element(By.CSS_SELECTOR,
                                                   'div[data-tab-id="tab-gs-travelDate-single"]')
@@ -106,10 +112,17 @@ def init_driver(link_to_scrape):
         dropdown_date_period_arrivals_submit = driver.find_element(By.CSS_SELECTOR,
                                                                    'button[data-testid="dropdown-window-button-submit"]')
         dropdown_date_period_arrivals_submit.click()
-        time.sleep(2)
-        global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
-                                                          'button[data-testid="global-search-button-submit"]')
-        global_search_button_submit.click()
+        time.sleep(1)
+        try:
+            global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
+                                                              'button[data-testid="global-search-button-submit"]')
+            global_search_button_submit.click()
+        except ElementClickInterceptedException:
+            time.sleep(5)
+            global_search_button_submit = driver.find_element(By.CSS_SELECTOR,
+                                                                  'button[data-testid="global-search-button-submit"]')
+            global_search_button_submit.click()
+
 
         time.sleep(15)
         offers_for_current_day = driver.find_elements(By.CSS_SELECTOR, 'div[data-testid="offer-tile"]')
