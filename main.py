@@ -24,12 +24,36 @@ def find_element_with_exception(offer, by, selector, *, attribute=None, text_to_
         return None
 
 
+def process_variable(variable, operation=None, *args):
+    if variable is not None:
+        if operation:
+            variable = operation(variable, *args)
+        return variable
+    return None
+
+
+# operation functions
+def split_and_get_first(text, delimiter):
+    return text.split(delimiter)[0]
+
+
+def split_and_get_second(text, delimiter):
+    return text.split(delimiter)[1]
+
+
+def remove_parentheses(text):
+    return text.replace("(", "").replace(")", "")
+
+
+def remove_whitespace(text):
+    return text.replace(" ", "")
+
+
 def init_driver(link_to_scrape):
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
     # chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
-    wait = WebDriverWait(driver, 3)
     driver.get(link_to_scrape)
     driver.maximize_window()
     accept_cookies_button = driver.find_element(By.XPATH, "//button[contains(., 'Zaakceptuj')]")
@@ -44,25 +68,28 @@ def init_driver(link_to_scrape):
     time.sleep(3)
 
     # choosing list of airport from where last minute offers should be shown
-    dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
+    try:
+        dropdown_airports_of_departure = driver.find_element(By.CSS_SELECTOR,
                                                          'button[data-testid="dropdown-field--airport"]')
-    dropdown_airports_of_departure.click()
+        dropdown_airports_of_departure.click()
+    except NoSuchElementException:
+        time.sleep(1)
+    else:
+        time.sleep(1)
+        acceptable_airports = ["Warszawa-Chopina", "Warszawa-Radom", "Warszawa-Modlin"]
+        for airport in acceptable_airports:
+            try:
+                airport_checkbox = driver.find_element(By.XPATH, f'//label[contains(text(), "{airport}")]')
+                airport_checkbox.click()
+            except ElementClickInterceptedException:
+                continue
 
-    time.sleep(1)
-    acceptable_airports = ["Warszawa-Chopina", "Warszawa-Radom", "Warszawa-Modlin"]
-    for airport in acceptable_airports:
-        try:
-            airport_checkbox = driver.find_element(By.XPATH, f'//label[contains(text(), "{airport}")]')
-            airport_checkbox.click()
-        except ElementClickInterceptedException:
-            continue
-
-    acceptable_airports_submit = driver.find_element(By.CSS_SELECTOR,
-                                                     'button[data-testid="dropdown-window-button-submit"]')
-    acceptable_airports_submit.click()
-    time.sleep(3)
+        acceptable_airports_submit = driver.find_element(By.CSS_SELECTOR,
+                                                         'button[data-testid="dropdown-window-button-submit"]')
+        acceptable_airports_submit.click()
 
     # choosing date period of arrivals
+    time.sleep(1)
     start = '2023-09-15'
     num_of_dates = 8
     date_list = [datetime.strptime(start, '%Y-%m-%d').date() + timedelta(days=x) for x in range(num_of_dates)]
@@ -94,30 +121,35 @@ def init_driver(link_to_scrape):
             hotel = find_element_with_exception(offer, By.CLASS_NAME, 'offer-tile-body__header', text_to_extract=True)
             country = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]',
                                                   attribute="destination")
-            country = country.split(", ")[0]
+            country = process_variable(country, split_and_get_first,", ")
             region = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]', attribute="destination")
             offer_link = find_element_with_exception(offer, By.XPATH, f'//a[@hotelname="{hotel}"]', attribute="href")
             trip_advisor_rating = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                               'div[data-testid="tripadvisor-opinions-badge"]',
                                                               text_to_extract=True)
-            trip_advisor_rating = trip_advisor_rating.split("\n")[0]
+            trip_advisor_rating = process_variable(trip_advisor_rating, split_and_get_first,"\n")
             trip_advisor_opinions = find_element_with_exception(offer, By.CSS_SELECTOR,
                                                                 'div[data-testid="tripadvisor-opinions-badge"]',
                                                                 text_to_extract=True)
-            trip_advisor_opinions = trip_advisor_opinions.split("\n")[1]
+            trip_advisor_opinions = process_variable(trip_advisor_opinions, split_and_get_second, "\n")
             departure_airport = find_element_with_exception(offer, By.CSS_SELECTOR,
-                                                            'div[data-testid="dropdown--same-day-offers"]', text_to_extract=True)
-            departure_airport = departure_airport.split(" ")[0]
+                                                            'div[data-testid="dropdown--same-day-offers"]',
+                                                            text_to_extract=True)
+            departure_airport = process_variable(departure_airport, split_and_get_first, " ")
+
             departure_time = find_element_with_exception(offer, By.CSS_SELECTOR,
-                                                         'div[data-testid="dropdown--same-day-offers"]', text_to_extract=True)
-            departure_time = departure_time.split(" ")[1].replace("(", "").replace(")", "")
-            price = find_element_with_exception(offer, By.CSS_SELECTOR, 'span[data-testid="price-amount"]', text_to_extract=True)
-            price = price.replace(" ", "")
+                                                         'div[data-testid="dropdown--same-day-offers"]',
+                                                         text_to_extract=True)
+            departure_time = process_variable(departure_time, split_and_get_second, " ")
+            price = find_element_with_exception(offer, By.CSS_SELECTOR, 'span[data-testid="price-amount"]',
+                                                text_to_extract=True)
+            price = process_variable(price, remove_whitespace)
             currency = find_element_with_exception(offer, By.CLASS_NAME, 'price-value__currency', text_to_extract=True)
             board_type = find_element_with_exception(offer, By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]',
                                                      text_to_extract=True)
             offer_date = find_element_with_exception(offer, By.CSS_SELECTOR,
-                                                     'span[data-testid="offer-tile-departure-date"]', text_to_extract=True)
+                                                     'span[data-testid="offer-tile-departure-date"]',
+                                                     text_to_extract=True)
 
             print(f"Hotel: {hotel}")
             print(f"country: {country}")
@@ -160,66 +192,3 @@ def init_driver(link_to_scrape):
 
 init_driver("https://www.tui.pl/")
 
-# for offer in offers_for_current_day:
-#     try:
-#         hotel = offer.find_element(By.CLASS_NAME, 'offer-tile-body__header')
-#         hotel = hotel.text
-#     except NoSuchElementException:
-#         hotel = None
-#     try:
-#         country = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
-#         country = country.get_attribute('destination').split(", ")[0]
-#     except NoSuchElementException:
-#         country = None
-#     try:
-#         region = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
-#         region = region.get_attribute('destination')
-#     except NoSuchElementException:
-#         region = None
-#     try:
-#         offer_link = offer.find_element(By.XPATH, f'//a[@hotelname="{hotel}"]')
-#         offer_link = offer_link.get_attribute('href')
-#     except NoSuchElementException:
-#         offer_link = None
-#     try:
-#         trip_advisor_rating = offer.find_element(By.CSS_SELECTOR,
-#                                                  'div[data-testid="tripadvisor-opinions-badge"]')
-#         trip_advisor_rating = trip_advisor_rating.text.split("\n")[0]
-#     except NoSuchElementException:
-#         trip_advisor_rating = None
-#     try:
-#         trip_advisor_opinions = offer.find_element(By.CSS_SELECTOR,
-#                                                    'div[data-testid="tripadvisor-opinions-badge"]')
-#         trip_advisor_opinions = trip_advisor_opinions.text.split("\n")[1]
-#     except NoSuchElementException:
-#         trip_advisor_opinions = None
-#     try:
-#         departure_airport = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]')
-#         departure_airport = departure_airport.text.split(" ")[0]
-#     except NoSuchElementException:
-#         departure_airport = None
-#     try:
-#         departure_time = offer.find_element(By.CSS_SELECTOR, 'div[data-testid="dropdown--same-day-offers"]')
-#         departure_time = departure_time.text.split(" ")[1].replace("(", "").replace(")", "")
-#     except NoSuchElementException:
-#         departure_time = None
-#     try:
-#         price = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="price-amount"]')
-#         price = price.text.replace(" ", "")
-#     except NoSuchElementException:
-#         price = None
-#     try:
-#         currency = offer.find_element(By.CLASS_NAME, 'price-value__currency')
-#         currency = currency.text
-#     except NoSuchElementException:
-#         currency = None
-#     try:
-#         board_type = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-boardType"]')
-#         board_type = board_type.text
-#     except NoSuchElementException:
-#         board_type = None
-#     try:
-#         offer_date = offer.find_element(By.CSS_SELECTOR, 'span[data-testid="offer-tile-departure-date"]')
-#         offer_date = offer_date.text
-#     except NoSuchElementException:
-#         offer_date = None
