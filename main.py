@@ -98,7 +98,7 @@ def init_driver(link_to_scrape):
 
     # choosing date period of arrivals
     time.sleep(1)
-    start = "2023-09-08"
+    start = "2023-09-11"
     num_of_dates = 10
     date_list = [
         datetime.strptime(start, "%Y-%m-%d").date() + timedelta(days=x)
