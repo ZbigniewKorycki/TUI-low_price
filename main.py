@@ -1,14 +1,13 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import (
-    NoSuchElementException,
-    ElementClickInterceptedException,
-)
+import csv
 import time
 from datetime import datetime, timedelta
-import csv
+
+from selenium import webdriver
+from selenium.common.exceptions import (ElementClickInterceptedException,
+                                        NoSuchElementException)
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 all_offers_from_given_dates = []
 
