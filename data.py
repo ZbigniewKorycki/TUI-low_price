@@ -1,8 +1,16 @@
 import pandas as pd
+import os
 
 offers = pd.read_csv(
     "TUI_last_minute_offers.csv", encoding="ISO-8859-2", encoding_errors="replace"
 )
+
+if os.path.exists("Offers_under_1500_TUI.csv"):
+    os.remove("Offers_under_1500_TUI.csv")
+if os.path.exists("Offers_under_1250_TUI.csv"):
+    os.remove("Offers_under_1250_TUI.csv")
+if os.path.exists("Offers_under_1000_TUI.csv"):
+    os.remove("Offers_under_1000_TUI.csv")
 
 not_acceptable_ratings = ["2/5", "2.5/5", "3/5", "3.5/5"]
 not_acceptable_countries = ["Bułgaria", "Albania", "Węgry", "Czechy", "Austria"]
@@ -39,7 +47,6 @@ offers_above_4_wished_countries_below_1000 = pd.merge(
     how="inner",
 )
 
-
 final_offers_1500 = offers_above_4_wished_countries_below_1500[
     ~offers_above_4_wished_countries_below_1500["hotel"].isin(not_acceptable_hotels)
 ]
@@ -49,7 +56,6 @@ final_offers_1250 = offers_above_4_wished_countries_below_1250[
 final_offers_1000 = offers_above_4_wished_countries_below_1000[
     ~offers_above_4_wished_countries_below_1000["hotel"].isin(not_acceptable_hotels)
 ]
-
 
 if not final_offers_1500.empty:
     final_offers_1500.to_csv("Offers_under_1500_TUI.csv")

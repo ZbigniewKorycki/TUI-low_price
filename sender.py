@@ -7,14 +7,14 @@ email_sender = os.environ.get("EMAIL_SENDER")
 email_password = os.environ.get("EMAIL_PASSWORD")
 email_receiver = os.environ.get("EMAIL_RECEIVER")
 
-subject = "Subject"
+subject = "Latest TUI Offers"
 body = "Body"
 
 em = EmailMessage()
 em["From"] = email_sender
 em["To"] = email_receiver
 em["Subject"] = subject
-em.set_content("Offers")
+em.set_content("Below are attached TUI Last Minute offers.")
 
 context = ssl.create_default_context()
 
