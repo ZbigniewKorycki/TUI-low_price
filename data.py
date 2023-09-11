@@ -50,9 +50,10 @@ final_offers_1000 = offers_above_4_wished_countries_below_1000[
     ~offers_above_4_wished_countries_below_1000["hotel"].isin(not_acceptable_hotels)
 ]
 
+
 if not final_offers_1500.empty:
-    print(final_offers_1500)
+    final_offers_1500.to_csv("Offers_under_1500_TUI.csv")
 if not final_offers_1250.empty:
-    print(final_offers_1250)
+    final_offers_1250.to_csv("Offers_under_1250_TUI.csv")
 if not final_offers_1000.empty:
-    print(final_offers_1000)
+    final_offers_1000.to_csv("Offers_under_1000_TUI.csv")
