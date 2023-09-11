@@ -1,4 +1,5 @@
 import csv
+import os
 import time
 from datetime import datetime, timedelta
 
@@ -8,6 +9,9 @@ from selenium.common.exceptions import (ElementClickInterceptedException,
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from extractor import start_extractor
+from sender import start_sender
+
 
 all_offers_from_given_dates = []
 
@@ -98,8 +102,8 @@ def init_driver(link_to_scrape):
 
     # choosing date period of arrivals
     time.sleep(1)
-    start = "2023-09-11"
-    num_of_dates = 10
+    start = datetime.now().strftime("%Y-%m-%d")
+    num_of_dates = 2
     date_list = [
         datetime.strptime(start, "%Y-%m-%d").date() + timedelta(days=x)
         for x in range(num_of_dates)
@@ -132,7 +136,7 @@ def init_driver(link_to_scrape):
             By.CSS_SELECTOR, 'button[data-testid="dropdown-window-button-submit"]'
         )
         dropdown_date_period_arrivals_submit.click()
-        time.sleep(1)
+        time.sleep(3)
         try:
             global_search_button_submit = driver.find_element(
                 By.CSS_SELECTOR, 'button[data-testid="global-search-button-submit"]'
@@ -222,19 +226,6 @@ def init_driver(link_to_scrape):
             departure_time = process_variable(departure_time, split_and_get_second, " ")
             price = process_variable(price, remove_whitespace)
 
-            # print(f"Hotel: {hotel}")
-            # print(f"country: {country}")
-            # print(f"region : {region}")
-            # print(f"trip_advisor_rating: {trip_advisor_rating}")
-            # print(f"trip_advisor_opinions: {trip_advisor_opinions}")
-            # print(f"departure_airport: {departure_airport}")
-            # print(f"departure_time: {departure_time}")
-            # print(f"price: {price}")
-            # print(f"currency: {currency}")
-            # print(f"board_type: {board_type}")
-            # print(f"offer_date: {offer_date}")
-            # print(f"offer_link: {offer_link}")
-
             single_offer = {
                 "hotel": hotel,
                 "country": country,
@@ -251,6 +242,8 @@ def init_driver(link_to_scrape):
             }
             all_offers_from_given_dates.append(single_offer)
         time.sleep(5)
+    if os.path.exists("TUI_last_minute_offers.csv"):
+        os.remove("TUI_last_minute_offers.csv")
     tui_offers = "TUI_last_minute_offers.csv"
     fields = [
         "hotel",
@@ -274,3 +267,5 @@ def init_driver(link_to_scrape):
 
 
 init_driver("https://www.tui.pl/")
+start_extractor()
+start_sender()
