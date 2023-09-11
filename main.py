@@ -105,7 +105,7 @@ def init_driver(link_to_scrape):
     # choosing date period of arrivals
     time.sleep(1)
     start = datetime.now().strftime("%Y-%m-%d")
-    num_of_dates = 2
+    num_of_dates = 7
     date_list = [
         datetime.strptime(start, "%Y-%m-%d").date() + timedelta(days=x)
         for x in range(num_of_dates)

@@ -14,7 +14,7 @@ def start_extractor():
     not_acceptable_countries = ["Bułgaria", "Albania", "Węgry", "Czechy", "Austria"]
     not_acceptable_hotels = ["Savvas", "Marianna Apart Hotel"]
 
-    offers_price_below_1500 = offers.loc[offers["price"] <= 5000]
+    offers_price_below_1500 = offers.loc[offers["price"] <= 1500]
 
     offers_with_rating_above_4_or_none = offers[
         ~offers["trip_advisor_rating"].isin(not_acceptable_ratings)
