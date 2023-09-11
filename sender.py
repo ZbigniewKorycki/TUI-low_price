@@ -4,7 +4,6 @@ import ssl
 import smtplib
 
 
-
 def start_sender():
     email_sender = os.environ.get("EMAIL_SENDER")
     email_password = os.environ.get("EMAIL_PASSWORD")
@@ -38,6 +37,3 @@ def start_sender():
                 print(f"An error occurred: {e}")
     except FileNotFoundError:
         print("File not found.")
-
-
-

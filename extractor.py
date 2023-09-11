@@ -19,11 +19,15 @@ def start_extractor():
     offers_with_rating_above_4_or_none = offers[
         ~offers["trip_advisor_rating"].isin(not_acceptable_ratings)
     ]
-    offers_with_wished_countries = offers[~offers["country"].isin(not_acceptable_countries)]
+    offers_with_wished_countries = offers[
+        ~offers["country"].isin(not_acceptable_countries)
+    ]
 
     offers_above_4_wished_countries_below_1500 = pd.merge(
         pd.merge(
-            offers_with_rating_above_4_or_none, offers_with_wished_countries, how="inner"
+            offers_with_rating_above_4_or_none,
+            offers_with_wished_countries,
+            how="inner",
         ),
         offers_price_below_1500,
         how="inner",
